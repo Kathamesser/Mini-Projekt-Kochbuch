@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Rezept speichern</title>
+</head>
+<body>
+    <a href="{{ url_for('menue') }}">Zurück zum Menü</a>
+
+    <!-- Dieses Formular wird für "Neu" UND "Bearbeiten" benutzt.
+         rezept ist None bei "Neu", sonst ist es das vorhandene Rezept. -->
+    <h1>{% if rezept %}Rezept bearbeiten{% else %}Neues Rezept{% endif %}</h1>
+
+    <form method="post">
+        <label>Name des Rezepts:</label><br>
+        <input type="text" name="titel" required value="{{ rezept.titel if rezept else '' }}"><br>
+
+        <label>Kategorie:</label><br>
+        <select name="kategorie">
+            {% for k in kategorien %}
+            <option {% if rezept and rezept.kategorie == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label>Dauer (Minuten):</label><br>
+        <input type="number" name="dauer" min="0" value="{{ rezept.dauer if rezept else '' }}"><br>
+
+        <!-- Zutaten: jede Zeile hat Menge, Einheit und Bezeichnung.
+             Alle Zeilen benutzen dieselben Feldnamen. In Flask bekommt man
+             sie als Listen mit request.form.getlist("menge") usw.
+             Der i-te Eintrag jeder Liste gehört zur selben Zutat. -->
+        <label>Zutaten:</label><br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Menge</th>
+                    <th>Einheit</th>
+                    <th>Bezeichnung</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="zutaten">
+                {% if rezept and rezept.zutaten %}
+                    {% for z in rezept.zutaten %}
+                    <tr>
+                        <td><input type="number" name="menge" min="0" step="any" value="{{ '%g' % z.menge if z.menge is not none else '' }}"></td>
+                        <td><input type="text" name="einheit" value="{{ z.einheit }}" placeholder="z. B. g"></td>
+                        <td><input type="text" name="bezeichnung" value="{{ z.bezeichnung }}" placeholder="z. B. Mehl"></td>
+                        <td><button type="button" onclick="zutatEntfernen(this)">Entfernen</button></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td><input type="number" name="menge" min="0" step="any"></td>
+                        <td><input type="text" name="einheit" placeholder="z. B. g"></td>
+                        <td><input type="text" name="bezeichnung" placeholder="z. B. Mehl"></td>
+                        <td><button type="button" onclick="zutatEntfernen(this)">Entfernen</button></td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <button type="button" onclick="zutatHinzufuegen()">+ Zutat hinzufügen</button><br>
+
+        <label>Zubereitung:</label><br>
+        <textarea name="anleitung" rows="8" cols="60">{{ rezept.anleitung if rezept else '' }}</textarea><br>
+
+        <button type="submit">Speichern</button>
+    </form>
+
+    <script>
+        // Fügt eine neue, leere Zutaten-Zeile am Ende der Tabelle hinzu.
+        function zutatHinzufuegen() {
+            const zeile = document.createElement("tr");
+            zeile.innerHTML =
+                '<td><input type="number" name="menge" min="0" step="any"></td>' +
+                '<td><input type="text" name="einheit" placeholder="z. B. g"></td>' +
+                '<td><input type="text" name="bezeichnung" placeholder="z. B. Mehl"></td>' +
+                '<td><button type="button" onclick="zutatEntfernen(this)">Entfernen</button></td>';
+            document.getElementById("zutaten").appendChild(zeile);
+        }
+
+        // Entfernt die Zeile, in der der geklickte Button steht.
+        function zutatEntfernen(button) {
+            button.closest("tr").remove();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>{{ rezept.titel }}</title>
+</head>
+<body>
+    <a href="{{ url_for('menue') }}">Zurück zum Menü</a>
+
+    <h1>{{ rezept.titel }}</h1>
+    <p>
+        Kategorie: {{ rezept.kategorie }}
+        {% if rezept.dauer %} · Dauer: {{ rezept.dauer }} Minuten{% endif %}
+    </p>
+
+    <h2>Zutaten</h2>
+    {% if rezept.zutaten %}
+    <ul>
+        {% for z in rezept.zutaten %}
+        <li>{{ z.als_text() }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Keine Zutaten eingetragen.</p>
+    {% endif %}
+
+    <h2>Zubereitung</h2>
+    <!-- white-space: pre-line sorgt dafür, dass Zeilenumbrüche aus dem Textfeld erhalten bleiben -->
+    <p style="white-space: pre-line">{{ rezept.anleitung }}</p>
+
+    <form method="get" action="{{ url_for('rezept_bearbeiten', rezept_id=rezept.id) }}" style="display: inline">
+        <button type="submit">Bearbeiten</button>
+    </form>
+    <form method="post" action="{{ url_for('rezept_loeschen', rezept_id=rezept.id) }}" style="display: inline"
+          onsubmit="return confirm('Rezept wirklich löschen?')">
+        <button type="submit">Löschen</button>
+    </form>
+</body>
+</html>

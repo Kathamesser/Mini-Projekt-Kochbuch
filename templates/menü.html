@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Rezeptbuch – Menü</title>
+</head>
+<body>
+    <h1>Rezeptbuch</h1>
+
+    <!-- Rezept auswählen: die Liste kommt aus der Datenbank (rezepte, siehe app.py -> menue()) -->
+    <form method="get" action="{{ url_for('rezept_auswaehlen') }}">
+        <select name="rezept_id">
+            {% for r in rezepte %}
+            <option value="{{ r.id }}">{{ r.titel }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Anzeigen</button>
+    </form>
+
+    <!-- Neues Rezept anlegen -->
+    <form method="get" action="{{ url_for('rezept_neu') }}">
+        <button type="submit">Neues Rezept</button>
+    </form>
+</body>
+</html>
